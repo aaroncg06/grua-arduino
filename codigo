@@ -1,0 +1,47 @@
+#include <Servo.h>
+
+Servo servoX; // Servo para controlar el eje X de la grúa (inverso del eje Y)
+Servo servoY; // Servo para controlar el eje Y (inverso del eje X)
+
+int ejeX = 90; // Posición inicial del eje X
+int ejeY = 90; // Posición inicial del eje Y
+
+int inputYPrev = 0; // Valor anterior de la entrada del eje Y
+int inputXPrev = 0; // Valor anterior de la entrada del eje X
+
+void setup() {
+  servoX.attach(9); // Conecta el servoX al pin 9
+  servoY.attach(6); // Conecta el servoY al pin 6
+
+  servoX.write(ejeX); // Configura el servoX en la posición inicial
+  servoY.write(ejeY); // Configura el servoY en la posición inicial
+}
+
+void loop() {
+  // Leer la entrada o señal de control para el eje Y (por ejemplo, un potenciómetro)
+  int inputY = analogRead(A0);
+
+  // Leer la entrada o señal de control para el eje X (por ejemplo, otro potenciómetro)
+  int inputX = analogRead(A1);
+
+  // Verificar si hay cambios en los valores de entrada de los joysticks
+  if (inputY != inputYPrev || inputX != inputXPrev) {
+    // Mapear los valores de entrada a los rangos de 0 a 180 grados
+    int mapeoY = map(inputY, 0, 1023, 0, 180);
+    int mapeoX = map(inputX, 0, 1023, 0, 180);
+
+    // Calcular las posiciones invertidas para los servos
+    ejeY = 180 - mapeoX;
+    ejeX = 180 - mapeoY;
+
+    // Mover los servos a las posiciones correspondientes
+    servoX.write(ejeX);
+    servoY.write(ejeY);
+
+    // Actualizar los valores previos de las entradas de los joysticks
+    inputYPrev = inputY;
+    inputXPrev = inputX;
+  }
+
+  delay(15);
+}
